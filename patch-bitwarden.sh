@@ -11,7 +11,7 @@ BW_VERSION="$(curl --silent https://raw.githubusercontent.com/bitwarden/server/m
 echo "Starting Bitwarden update, newest server version: $BW_VERSION"
 
 # Get Bitwarden base from user (or keep default value)
-read -p "Enter Bitwarden base directory [$SCRIPT_BASE]: " tmpbase
+read -e -rp "Enter Bitwarden base directory [$SCRIPT_BASE]: " tmpbase
 SCRIPT_BASE=${tmpbase:-$SCRIPT_BASE}
 
 # Check if directory exists and is valid
