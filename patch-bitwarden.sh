@@ -1,5 +1,9 @@
 #!/bin/bash
 
+yq() {
+  docker run --rm -i -v "${PWD}:/workdir" mikefarah/yq:4 "$@"
+}
+
 # Default path is the current directory of the BitBetter script
 SCRIPT_BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 BW_VERSION="$(curl --silent https://raw.githubusercontent.com/bitwarden/server/master/scripts/bitwarden.sh | grep 'COREVERSION="' | sed 's/^[^"]*"//; s/".*//')"
@@ -21,18 +25,10 @@ RECREATE_OV=${tmprecreate:-$RECREATE_OV}
 
 if [[ $RECREATE_OV =~ ^[Yy]$ ]]
 then
-    {
-        echo "version: '3'"
-        echo ""
-        echo "services:"
-        echo "  api:"
-        echo "    image: ghcr.io/alexyao2015/bitbetter:api-$BW_VERSION"
-        echo ""
-        echo "  identity:"
-        echo "    image: ghcr.io/alexyao2015/bitbetter:identity-$BW_VERSION"
-        echo ""
-    } > $SCRIPT_BASE/bwdata/docker/docker-compose.override.yml
-    echo "BitBetter docker-compose override created!"
+    yq -i eval "version = '3'" $SCRIPT_BASE/bwdata/docker/docker-compose.override.yml
+    yq -i eval "services.api.image = 'ghcr.io/alexyao2015/bitbetter:api-$BW_VERSION'" $SCRIPT_BASE/bwdata/docker/docker-compose.override.yml
+    yq -i eval "services.identity.image = 'ghcr.io/alexyao2015/bitbetter:identity-$BW_VERSION'"
+    echo "BitBetter docker-compose override updated!"
 else
     echo "Make sure to check if the docker override contains the correct image version ($BW_VERSION) in $SCRIPT_BASE/bwdata/docker/docker-compose.override.yml!"
 fi
