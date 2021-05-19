@@ -1,7 +1,7 @@
 #!/bin/bash
 
 yq() {
-  docker run --rm -i -v "${PWD}:/workdir" mikefarah/yq:4 "$@"
+  docker run --rm -i -v "${SCRIPT_BASE}:/workdir" mikefarah/yq:4 "$@"
 }
 
 # Default path is the current directory of the BitBetter script
@@ -12,7 +12,7 @@ echo "Starting Bitwarden update, newest server version: $BW_VERSION"
 
 # Get Bitwarden base from user (or keep default value)
 read -e -rp "Enter Bitwarden base directory [$SCRIPT_BASE]: " tmpbase
-SCRIPT_BASE=${tmpbase:-$SCRIPT_BASE}
+SCRIPT_BASE=${tmpbase%/:-$SCRIPT_BASE}
 
 # Check if directory exists and is valid
 [ -d "$SCRIPT_BASE" ] || { echo "Bitwarden base directory $SCRIPT_BASE not found!"; exit 1; }
@@ -25,9 +25,9 @@ RECREATE_OV=${tmprecreate:-$RECREATE_OV}
 
 if [[ $RECREATE_OV =~ ^[Yy]$ ]]
 then
-    yq -i eval "version = '3'" $SCRIPT_BASE/bwdata/docker/docker-compose.override.yml
-    yq -i eval "services.api.image = 'ghcr.io/alexyao2015/bitbetter:api-$BW_VERSION'" $SCRIPT_BASE/bwdata/docker/docker-compose.override.yml
-    yq -i eval "services.identity.image = 'ghcr.io/alexyao2015/bitbetter:identity-$BW_VERSION'"
+    yq -i eval '.version = "3"' bwdata/docker/docker-compose.override.yml
+    yq -i eval ".services.api.image = \"ghcr.io/alexyao2015/bitbetter:api-$BW_VERSION\"" bwdata/docker/docker-compose.override.yml
+    yq -i eval ".services.identity.image = \"ghcr.io/alexyao2015/bitbetter:identity-$BW_VERSION\"" bwdata/docker/docker-compose.override.yml
     echo "BitBetter docker-compose override updated!"
 else
     echo "Make sure to check if the docker override contains the correct image version ($BW_VERSION) in $SCRIPT_BASE/bwdata/docker/docker-compose.override.yml!"
