@@ -14,8 +14,8 @@ Credit to https://github.com/h44z/BitBetter and https://github.com/jakeswenson/B
 1. [Getting Started](#getting-started)
     + [Dependencies](#dependencies)
     + [Setting up BitBetter](#setting-up-bitbetter)
-    + [Using Public Images](#using-public-images)
-    + [Using Public Images with Custom Certificate](#using-public-images-with-custom-certificate)
+        + [Using Public Images](#using-public-images)
+        + [Using Public Images with Custom Certificate](#using-public-images-with-custom-certificate)
     + [Building BitBetter](#building-bitbetter)
     + [Updating Bitwarden and BitBetter](#updating-bitwarden-and-bitbetter)
     + [Generating Signed Licenses](#generating-signed-licenses)
@@ -38,7 +38,7 @@ With your dependencies installed, begin the installation of BitBetter by downloa
 git clone https://github.com/jakeswenson/BitBetter.git
 ```
 
-## Using Public Images
+### Using Public Images
 First patch the Bitwarden script to use BitBetter Images:
 
 ```bash
@@ -57,7 +57,7 @@ Updating:
 sudo ./patch-bitwarden.sh
 ```
 
-## Using Public Images with Custom Certificate
+### Using Public Images with Custom Certificate
 Patch the Bitwarden script to use BitBetter Images (Automatically generates certificates):
 
 ```bash
