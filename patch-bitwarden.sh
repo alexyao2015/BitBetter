@@ -4,14 +4,23 @@ yq() {
   docker run --rm -i -v "${SCRIPT_BASE}:/workdir" mikefarah/yq:4 "$@"
 }
 
+ask () {
+  local __resultVar=$1
+  local __result="$2"
+  if [ -z "$2" ]; then
+    read -e -rp "$3" __result
+  fi
+  eval $__resultVar="'$__result'"
+}
+
 # Default path is the current directory of the BitBetter script
 SCRIPT_BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 BW_VERSION="$(curl --silent https://raw.githubusercontent.com/bitwarden/server/master/scripts/bitwarden.sh | grep 'COREVERSION="' | sed 's/^[^"]*"//; s/".*//')"
 
 echo "Starting Bitwarden update, newest server version: $BW_VERSION"
 
-# Get Bitwarden base from user (or keep default value)
-read -e -rp "Enter Bitwarden base directory [$SCRIPT_BASE]: " tmpbase
+# Get Bitwarden base from user (or keep default value) or use first argument
+ask tmpbase "$1" "Enter Bitwarden base directory [$SCRIPT_BASE]: "
 SCRIPT_BASE=${tmpbase:-$SCRIPT_BASE}
 
 # Check if directory exists and is valid
@@ -20,7 +29,7 @@ SCRIPT_BASE=${tmpbase:-$SCRIPT_BASE}
 
 # Check if user wants to recreate the docker-compose override file
 RECREATE_OV="y"
-read -p "Rebuild docker-compose override? [Y/n]: " tmprecreate
+ask tmprecreate "$2" "Rebuild docker-compose override? [Y/n]: "
 RECREATE_OV=${tmprecreate:-$RECREATE_OV}
 
 if [[ $RECREATE_OV =~ ^[Yy]$ ]]
