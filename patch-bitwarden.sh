@@ -4,6 +4,7 @@ yq() {
   docker run --rm -i -v "${SCRIPT_BASE}:/workdir" mikefarah/yq:4 "$@"
 }
 
+
 ask () {
   local __resultVar=$1
   local __result="$2"
@@ -21,6 +22,7 @@ echo "Starting Bitwarden update, newest server version: $BW_VERSION"
 
 # Get Bitwarden base from user (or keep default value) or use first argument
 ask tmpbase "$1" "Enter Bitwarden base directory [$SCRIPT_BASE]: "
+
 SCRIPT_BASE=${tmpbase:-$SCRIPT_BASE}
 
 # Check if directory exists and is valid
