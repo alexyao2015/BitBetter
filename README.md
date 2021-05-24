@@ -128,10 +128,13 @@ To update Bitwarden, ran `patch-bitwarden.sh` or `patch-bitwarden-custom.sh ` sc
 You can either run these scripts without providing any parameters, in interactive mode (e.g. `./patch-bitwarden.sh`) or by setting the parameters as follows, to run the script in non-interactive mode:
 ```bash
 ./patch-bitwarden.sh <bitwarden-path> <update-override>
+./patch-bitwarden-custom.sh <bitwarden-path> <update-override> <regenerate-certificates>
 ```
 `<bitwarden-path>`: The path to the directory containing your bwdata directory
 
 `<update-override>`: If you want the docker-compose.override.yml file to be updated (either `y` or `n`)
+
+`<regenerate-certificates>`: It you want to regenerate the custom certificates in bitwarden-path/bwdata/bitbetter (either `y` or `n`)
 
 
 ## Generating Signed Licenses
