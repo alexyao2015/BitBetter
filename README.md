@@ -123,7 +123,16 @@ openssl pkcs12 -export -out cert.pfx -inkey key.pem -in cert.pem -passin pass:te
 
 ## Updating Bitwarden and BitBetter
 
-To update Bitwarden, the provided `update-bitwarden.sh` script can be used. It will rebuild the BitBetter images and automatically update Bitwarden afterwards. Docker pull errors can be ignored for api and identity images.
+To update Bitwarden, ran `patch-bitwarden.sh` or `patch-bitwarden-custom.sh ` script, depending or your installation. It will rebuild the BitBetter images and automatically update Bitwarden afterwards. Docker pull errors can be ignored for api and identity images.
+
+You can either run these scripts without providing any parameters, in interactive mode (e.g. `./patch-bitwarden.sh`) or by setting the parameters as follows, to run the script in non-interactive mode:
+```bash
+./patch-bitwarden.sh <bitwarden-path> <update-override>
+```
+`<bitwarden-path>`: The path to the directory containing your bwdata directory
+
+`<update-override>`: If you want the docker-compose.override.yml file to be updated (either `y` or `n`)
+
 
 ## Generating Signed Licenses
 
