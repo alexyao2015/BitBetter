@@ -35,14 +35,14 @@ Aside from docker, which you also need for Bitwarden, BitBetter requires the fol
 With your dependencies installed, begin the installation of BitBetter by downloading it through Github or using the git command:
 
 ```bash
-git clone https://github.com/jakeswenson/BitBetter.git
+git clone https://github.com/alexyao2015/BitBetter.git
 ```
 
 ### Using Public Images
 First patch the Bitwarden script to use BitBetter Images:
 
 ```bash
-sudo curl -o patch-bitwarden.sh https://raw.githubusercontent.com/alexyao2015/BitBetter/public/patch-bitwarden.sh && sudo chmod 755 patch-bitwarden.sh && sudo ./patch-bitwarden.sh
+sudo chmod a+x patch-bitwarden.sh && sudo ./patch-bitwarden.sh
 ```
 
 Generate a License:
@@ -61,7 +61,7 @@ sudo ./patch-bitwarden.sh
 Patch the Bitwarden script to use BitBetter Images (Automatically generates certificates):
 
 ```bash
-sudo curl -o patch-bitwarden-custom.sh https://raw.githubusercontent.com/alexyao2015/BitBetter/public/patch-bitwarden-custom.sh && sudo chmod 755 patch-bitwarden-custom.sh && sudo ./patch-bitwarden-custom.sh
+sudo chmod a+x patch-bitwarden-custom.sh && sudo ./patch-bitwarden-custom.sh
 ```
 
 Generate Custom License:
