@@ -14,7 +14,7 @@ RUN set -e; set -x; \
 FROM ${BITWARDEN_TAG}
 
 COPY --from=build /bitBetter/bin/Debug/netcoreapp3.1/publish/* /bitBetter/
-COPY .bitbetter-entrypoint.sh /
+COPY ./bitbetter-entrypoint.sh /
 RUN chmod +x /bitbetter-entrypoint.sh
 
 ENTRYPOINT [ "/bitbetter-entrypoint.sh" ]
