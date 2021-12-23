@@ -1,7 +1,7 @@
 #!/bin/bash
 
 yq() {
-  docker run --rm -i -v "${SCRIPT_BASE}:/workdir" mikefarah/yq:4 "$@"
+  docker run --user="root" --rm -i -v "${SCRIPT_BASE}:/workdir" mikefarah/yq:4 "$@"
 }
 
 
