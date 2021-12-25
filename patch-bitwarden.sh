@@ -1,7 +1,7 @@
 #!/bin/bash
 
 yq() {
-  docker run --user="root" --rm -i -v "${SCRIPT_BASE}:/workdir" mikefarah/yq:4 "$@"
+  docker run --user="root" --rm -i -v "${SCRIPT_BASE}/${*: -2:1}/${*: -1}:/workdir/${*: -1}" mikefarah/yq:4 "${@:1:$#-2}" "${*: -1}"
 }
 
 
@@ -36,9 +36,9 @@ RECREATE_OV=${tmprecreate:-$RECREATE_OV}
 
 if [[ $RECREATE_OV =~ ^[Yy]$ ]]
 then
-    yq -i eval '.version = "3"' bwdata/docker/docker-compose.override.yml
-    yq -i eval ".services.api.image = \"ghcr.io/alexyao2015/bitbetter:api-$BW_VERSION\"" bwdata/docker/docker-compose.override.yml
-    yq -i eval ".services.identity.image = \"ghcr.io/alexyao2015/bitbetter:identity-$BW_VERSION\"" bwdata/docker/docker-compose.override.yml
+    yq -i eval '.version = "3"' bwdata/docker docker-compose.override.yml
+    yq -i eval ".services.api.image = \"ghcr.io/alexyao2015/bitbetter:api-$BW_VERSION\"" bwdata/docker docker-compose.override.yml
+    yq -i eval ".services.identity.image = \"ghcr.io/alexyao2015/bitbetter:identity-$BW_VERSION\"" bwdata/docker docker-compose.override.yml
     echo "BitBetter docker-compose override updated!"
 else
     echo "Make sure to check if the docker override contains the correct image version ($BW_VERSION) in $SCRIPT_BASE/bwdata/docker/docker-compose.override.yml!"
