@@ -45,7 +45,7 @@ jobs:
       - name: Get Latest Version
         id: get_version
         run: |
-          export BW_VERSION_LATEST="$(curl -sL https://go.btwrdn.co/bw-sh-versions | grep  '^ *"'coreVersion'":' | awk -F\: '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')"
+          export BW_VERSION_LATEST="$(curl -sL https://go.btwrdn.co/bw-sh-versions | grep '^ *"'coreVersion'":' | awk -F\: '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')"
           export BW_VERSION_LAST_BUILT="$(cat bw_version.txt)"
           if [ $BW_VERSION_LATEST == $BW_VERSION_LAST_BUILT ]; then
             export NEED_BUILD=false
