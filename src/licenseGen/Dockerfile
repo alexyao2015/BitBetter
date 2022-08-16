@@ -1,13 +1,13 @@
 ARG BITWARDEN_TAG
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 as build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 as build
 
 WORKDIR /licenseGen
 
 COPY ./src/licenseGen /licenseGen
 
 RUN set -ex \
-	&& dotnet add package Newtonsoft.Json --version 12.0.3 \
+	&& dotnet add package Newtonsoft.Json --version 13.0.1 \
 	&& dotnet restore \
 	&& dotnet publish -o bin
 
