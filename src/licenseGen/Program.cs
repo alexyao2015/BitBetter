@@ -420,7 +420,8 @@ namespace bitwardenSelfLicensor
             set("MaxStorageGb", storage);
             set("SelfHost", true);
             set("UsersGetPremium", true);
-            set("Version", 10);
+            set("UseCustomPermissions", true);
+            set("Version", 11);
             set("Issued", DateTime.UtcNow);
             set("Refresh", DateTime.UtcNow.AddYears(100).AddMonths(-1));
             set("Expires", DateTime.UtcNow.AddYears(100));
