@@ -421,9 +421,14 @@ namespace bitwardenSelfLicensor
             set("SelfHost", true);
             set("UsersGetPremium", true);
             set("UseCustomPermissions", true);
-            set("Version", 11);
+            set("UsePasswordManager", true);
+            set("UseSecretsManager", true);
+            set("SmSeats", (int)32767);
+            set("SmServiceAccounts", (int)32767);
+            set("Version", 13);
             set("Issued", DateTime.UtcNow);
             set("Refresh", DateTime.UtcNow.AddYears(100).AddMonths(-1));
+            set("ExpirationWithoutGracePeriod", DateTime.UtcNow.AddYears(100));
             set("Expires", DateTime.UtcNow.AddYears(100));
             set("Trial", false);
             set("UseApi", true);
