@@ -73,21 +73,54 @@ namespace bitwardenSelfLicensor
                 Console.WriteLine("Cant find inst");
             }
 
-            // foreach (var inst in ctor.Body.Instructions)
-            // {
-            //     Console.Write(inst.OpCode.Name + " " + inst.Operand?.GetType() + " = ");
-            //     if(inst.OpCode.FlowControl == FlowControl.Call) {
-            //         Console.WriteLine(inst.Operand);
-            //     }
-            //     else if(inst.OpCode == OpCodes.Ldstr) {
-            //         Console.WriteLine(inst.Operand);
-            //     }
-            //     else {Console.WriteLine();}
-            // }
+            EnableSecretManagerForCustomPlan(module);
 
             module.Write("modified.dll");
 
             return 0;
+        }
+
+        private static void EnableSecretManagerForCustomPlan(ModuleDefinition module)
+        {
+            var customPlanType = module
+                .Types
+                .Where(t => t.Namespace == "Bit.Core.Models.StaticStore.Plans" && t.Name == "CustomPlan")
+                .Single();
+
+            var ctor = customPlanType
+                .GetConstructors()
+                .Single(c => !c.HasParameters);
+            var rewriter = ctor.Body.GetILProcessor();
+
+            var secretsManagerSetter = customPlanType.BaseType.Resolve().Methods.Single(m => m.Name == "set_SecretsManager");
+            var customPlanSecretManagerFeature = module
+                .Types
+                .SingleOrDefault(t => t.Namespace == "Bit.Core.Models.StaticStore" && t.Name == "Plan")
+                .NestedTypes.SingleOrDefault(t => t.Name == "SecretsManagerPlanFeatures");
+            var customPlanSecretManagerFeatureCtor = customPlanSecretManagerFeature
+                .GetConstructors()
+                .Single(c => !c.HasParameters);
+
+            //remove latest part
+            rewriter.RemoveAt(rewriter.Body.Instructions.Count - 1);
+
+            //Initialize SecretsManager with new SecretsManagerPlanFeatures
+            rewriter.Emit(OpCodes.Ldarg_0);
+            rewriter.Emit(OpCodes.Newobj, customPlanSecretManagerFeatureCtor);
+
+            //SecretsManagerPlanFeatures.AllowSeatAutoscale = true
+            rewriter.Emit(OpCodes.Dup);
+            rewriter.Emit(OpCodes.Ldc_I4, 1);
+            rewriter.Emit(OpCodes.Call, customPlanSecretManagerFeature.Methods.Single(m => m.Name == "set_AllowSeatAutoscale"));
+
+            //SecretsManagerPlanFeatures.AllowServiceAccountsAutoscale = true
+            rewriter.Emit(OpCodes.Dup);
+            rewriter.Emit(OpCodes.Ldc_I4, 1);
+            rewriter.Emit(OpCodes.Call, customPlanSecretManagerFeature.Methods.Single(m => m.Name == "set_AllowServiceAccountsAutoscale"));
+            rewriter.Emit(OpCodes.Call, secretsManagerSetter);
+
+            //Append return statement again
+            rewriter.Emit(OpCodes.Ret);
         }
     }
 }
