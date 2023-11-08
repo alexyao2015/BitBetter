@@ -3,7 +3,7 @@ name: BitBetter Image
 on:
   push:
   schedule:
-    - cron:  '0 0 * * *'
+    - cron: "0 0 * * *"
 jobs:
   regenerate_cert:
     runs-on: ubuntu-latest
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: 'public'
+          ref: "public"
       - name: Check if Regeneration Requested
         id: check_regenerate
         run: |
@@ -41,11 +41,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: 'public'
+          ref: "public"
       - name: Get Latest Version
         id: get_version
         run: |
-          export BW_VERSION_LATEST="$(curl -sL https://go.btwrdn.co/bw-sh-versions | grep '^ *"'coreVersion'":' | awk -F\: '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')"
+          export BW_VERSION_LATEST="$(curl -sL "https://func.bitwarden.com/api/dl/?app=self-host&platform=linux" | grep '^COREVERSION=' | awk -F\" '/COREVERSION/{ print $2 }')"
           export BW_VERSION_LAST_BUILT="$(cat bw_version.txt)"
           if [ $BW_VERSION_LATEST == $BW_VERSION_LAST_BUILT ]; then
             export NEED_BUILD=false
@@ -101,7 +101,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: 'public'
+          ref: "public"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
@@ -196,7 +196,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: 'public'
+          ref: "public"
       # May fail if a push occurs but there is no new version to commit
       - name: Save Version Number
         continue-on-error: true

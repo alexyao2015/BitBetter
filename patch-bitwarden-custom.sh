@@ -15,7 +15,7 @@ ask () {
 
 # Default path is the current directory of the BitBetter script
 SCRIPT_BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-BW_VERSION="$(curl -sL https://go.btwrdn.co/bw-sh-versions | grep '^ *"'coreVersion'":' | awk -F\: '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')"
+BW_VERSION="$(curl -sL "https://func.bitwarden.com/api/dl/?app=self-host&platform=linux" | grep '^COREVERSION=' | awk -F\" '/COREVERSION/{ print $2 }')"
 
 echo "Starting Bitwarden update, newest server version: $BW_VERSION"
 
