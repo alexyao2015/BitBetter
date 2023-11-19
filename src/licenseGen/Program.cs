@@ -402,8 +402,8 @@ namespace bitwardenSelfLicensor
             set("BillingEmail", email);
             set("BusinessName", string.IsNullOrWhiteSpace(businessName) ? "BitBetter" : businessName);
             set("Enabled", true);
-            set("Plan", "Custom");
-            set("PlanType", (byte)6);
+            set("Plan", "Enterprise (Annually)");
+            set("PlanType", (byte)15);
             set("Seats", (int)32767);
             set("MaxCollections", short.MaxValue);
             set("UsePolicies", true);
