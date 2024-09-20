@@ -11,7 +11,7 @@ jobs:
     outputs:
       regenerate: ${{ steps.check_regenerate.outputs.regenerate }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: "public"
       - name: Check if Regeneration Requested
@@ -39,7 +39,7 @@ jobs:
       buildimage: ${{ steps.get_version.outputs.buildimage }}
       buildversion: ${{ steps.get_version.outputs.buildversion }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: "public"
       - name: Get Latest Version
