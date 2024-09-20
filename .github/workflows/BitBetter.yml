@@ -99,11 +99,11 @@ jobs:
             target: custom
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: "public"
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
         with:
           install: true
       - name: Build
@@ -120,7 +120,7 @@ jobs:
         run: |
           docker save --output output.tar bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }}
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ci-${{ matrix.image_name }}-${{ github.run_number }}.tar
           path: output.tar
@@ -162,7 +162,7 @@ jobs:
           echo Repository set as: ${REPO}
           echo Image name set as: ${IMAGE_NAME}
       - name: Download container artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: ci-${{ matrix.image_name }}-${{ github.run_number }}.tar
       - name: Import image
@@ -194,7 +194,7 @@ jobs:
     env:
       VERSION: ${{ needs.check_version.outputs.buildversion }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: "public"
       # May fail if a push occurs but there is no new version to commit
