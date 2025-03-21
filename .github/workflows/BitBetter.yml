@@ -70,32 +70,32 @@ jobs:
         include:
           - image_name: api
             src_location: ./src/bitBetter/Dockerfile
-            build_arg: BITWARDEN_TAG=bitwarden/api
+            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
             target: public
           - image_name: identity
             src_location: ./src/bitBetter/Dockerfile
-            build_arg: BITWARDEN_TAG=bitwarden/identity
+            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/identity
             target: public
           - image_name: licensegen
             src_location: ./src/licenseGen/Dockerfile
-            build_arg: BITWARDEN_TAG=bitwarden/api
+            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
             target: public
 
           - image_name: api-custom
             src_location: ./src/bitBetter/Dockerfile
-            build_arg: BITWARDEN_TAG=bitwarden/api
+            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
             target: custom
           - image_name: identity-custom
             src_location: ./src/bitBetter/Dockerfile
-            build_arg: BITWARDEN_TAG=bitwarden/identity
+            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/identity
             target: custom
           - image_name: licensegen-custom
             src_location: ./src/licenseGen/Dockerfile
-            build_arg: BITWARDEN_TAG=bitwarden/api
+            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
             target: custom
           - image_name: certificate-gen
             src_location: ./publicKeys/Dockerfile
-            build_arg: BITWARDEN_TAG=bitwarden/api
+            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
             target: custom
 
     steps:
@@ -138,15 +138,24 @@ jobs:
               url: "https://index.docker.io/v1/",
               username: dockerID,
               password: dockerPassword,
-              repo: yaoa/bitbetter
+              repo: yaoa/bitbetter,
             }
           - {
               url: ghcr.io/alexyao2015,
               username: CR_USER,
               password: CR_PAT,
-              repo: ghcr.io/alexyao2015/bitbetter
+              repo: ghcr.io/alexyao2015/bitbetter,
             }
-        image_name: [api, identity, licensegen, api-custom, identity-custom, licensegen-custom, certificate-gen]
+        image_name:
+          [
+            api,
+            identity,
+            licensegen,
+            api-custom,
+            identity-custom,
+            licensegen-custom,
+            certificate-gen,
+          ]
 
     steps:
       # just to improve readability
