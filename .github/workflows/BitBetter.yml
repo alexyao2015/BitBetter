@@ -58,44 +58,85 @@ jobs:
           echo Last build version: ${BW_VERSION_LAST_BUILT}
           echo Build version: ${BW_VERSION_LATEST}
 
+  build_bitwarden:
+    runs-on: ubuntu-latest
+    name: Build Bitwarden
+    needs: [check_version, regenerate_cert]
+    if: ${{ needs.check_version.outputs.buildimage == 'true' || needs.regenerate_cert.outputs.regenerate == 'true' || github.event_name == 'push' }}
+    strategy:
+      matrix:
+        include:
+          - image_name: api
+            src_location: src/Api/Dockerfile
+          - image_name: identity
+            src_location: src/Identity/Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: bitwarden/server
+          # The bitwarden/server tags are prefixed by v
+          ref: "v${{ needs.check_version.outputs.buildversion }}"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+      - name: Patch source
+        # This removes the single file publish option which breaks resource replacement
+        run: |
+          sed -i 's|/p:PublishSingleFile=true||' ${{ matrix.src_location }}
+          cat ${{ matrix.src_location }}
+      - name: Build
+        run: |
+          docker build \
+            --tag bitbetter/bitwarden/${{ matrix.image_name }}:${{ needs.check_version.outputs.buildversion }} \
+            --progress plain \
+            --file ${{ matrix.src_location }} \
+            --load \
+            .
+      - name: Save tarball
+        run: |
+          docker save --output output.tar bitbetter/bitwarden/${{ matrix.image_name }}:${{ needs.check_version.outputs.buildversion }}
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-bitbetter-bitwarden-${{ matrix.image_name }}-${{ needs.check_version.outputs.buildversion }}-${{ github.run_number }}.tar
+          path: output.tar
+
   build_bitbetter:
     runs-on: ubuntu-latest
     name: Build BitBetter
-    needs: [check_version, regenerate_cert]
-    if: ${{ needs.check_version.outputs.buildimage == 'true' || needs.regenerate_cert.outputs.regenerate == 'true' || github.event_name == 'push' }}
-    env:
-      VERSION: ${{ needs.check_version.outputs.buildversion }}
+    needs: [check_version, build_bitwarden]
     strategy:
       matrix:
         include:
           - image_name: api
             src_location: ./src/bitBetter/Dockerfile
-            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
+            bitwarden_image_name: api
             target: public
           - image_name: identity
             src_location: ./src/bitBetter/Dockerfile
-            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/identity
+            bitwarden_image_name: identity
             target: public
           - image_name: licensegen
             src_location: ./src/licenseGen/Dockerfile
-            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
+            bitwarden_image_name: api
             target: public
 
           - image_name: api-custom
             src_location: ./src/bitBetter/Dockerfile
-            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
+            bitwarden_image_name: api
             target: custom
           - image_name: identity-custom
             src_location: ./src/bitBetter/Dockerfile
-            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/identity
+            bitwarden_image_name: identity
             target: custom
           - image_name: licensegen-custom
             src_location: ./src/licenseGen/Dockerfile
-            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
+            bitwarden_image_name: api
             target: custom
           - image_name: certificate-gen
             src_location: ./publicKeys/Dockerfile
-            build_arg: BITWARDEN_TAG=ghcr.io/bitwarden/api
+            bitwarden_image_name: api
             target: custom
 
     steps:
@@ -106,10 +147,17 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           install: true
+      - name: Download container artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: "ci-bitbetter-bitwarden-${{ matrix.bitwarden_image_name }}-${{ needs.check_version.outputs.buildversion }}-${{ github.run_number }}.tar"
+      - name: Import image
+        run: |
+          docker load --input output.tar
       - name: Build
         run: |
           docker build \
-            --build-arg ${{ matrix.build_arg }}:${VERSION} \
+            --build-arg BITWARDEN_TAG=bitbetter/bitwarden/${{ matrix.bitwarden_image_name }}:${{ needs.check_version.outputs.buildversion }} \
             --target ${{ matrix.target }} \
             --tag bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }} \
             --progress plain \
