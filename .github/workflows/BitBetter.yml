@@ -79,6 +79,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
+          driver: docker
           install: true
       - name: Patch source
         # This removes the single file publish option which breaks resource replacement
@@ -91,7 +92,6 @@ jobs:
             --tag bitbetter/bitwarden/${{ matrix.image_name }}:${{ needs.check_version.outputs.buildversion }} \
             --progress plain \
             --file ${{ matrix.src_location }} \
-            --load \
             .
       - name: Save tarball
         run: |
@@ -146,6 +146,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
+          driver: docker
           install: true
       - name: Download container artifact
         uses: actions/download-artifact@v4
@@ -162,7 +163,6 @@ jobs:
             --tag bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }} \
             --progress plain \
             --file ${{ matrix.src_location }} \
-            --load \
             .
       - name: Save tarball
         run: |
