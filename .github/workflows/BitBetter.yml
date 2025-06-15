@@ -18,7 +18,7 @@ jobs:
         id: check_regenerate
         run: |
           export REGENERATE="$(cat regenerate_cert.txt)"
-          echo "##[set-output name=regenerate;]$REGENERATE"
+          echo "regenerate=$REGENERATE" >> $GITHUB_OUTPUT
       - name: Regenerate Certificate
         id: regenerate
         if: ${{ steps.check_regenerate.outputs.regenerate == 'true' }}
@@ -52,8 +52,8 @@ jobs:
           else
             export NEED_BUILD=true
           fi
-          echo "##[set-output name=buildimage;]$NEED_BUILD"
-          echo "##[set-output name=buildversion;]$BW_VERSION_LATEST"
+          echo "buildimage=$NEED_BUILD" >> $GITHUB_OUTPUT
+          echo "buildversion=$BW_VERSION_LATEST" >> $GITHUB_OUTPUT
           echo Build required: ${NEED_BUILD}
           echo Last build version: ${BW_VERSION_LAST_BUILT}
           echo Build version: ${BW_VERSION_LATEST}
