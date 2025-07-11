@@ -1,0 +1,2 @@
+cryptography==45.0.5
+pyjwt==2.10.1
