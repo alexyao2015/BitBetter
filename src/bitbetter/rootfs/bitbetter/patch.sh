@@ -75,34 +75,29 @@ cert_hash_replace_files=$( \
 echo "Detected files to replace certificate in: ${cert_replace_files}"
 echo "Detected files to replace certificate hash in: ${cert_hash_replace_files}"
 
-for file in ${cert_replace_files}; do
-    xxd -p "${file}" \
-    | tr -d '\n' \
-    | sed -e "s|${original_cert}|${new_cert}|" \
-    | xxd -r -p \
-    > "${file}.new"
-    if cmp -s "${file}" "${file}.new"; then
-        echo "No changes made to ${file}. Exiting."
-        exit 1
-    fi
-    mv "${file}.new" "${file}"
-    chmod +x "${file}"
-    echo "Replaced certificate in ${file}"
-done
+replace_in_files() {
+    local replace_type="$1"
+    local replacement_files="$2"
+    local old_string="$3"
+    local new_string="$4"
+    
+    for file in ${replacement_files}; do
+        xxd -p "${file}" \
+        | tr -d '\n' \
+        | sed -e "s|${old_string}|${new_string}|" \
+        | xxd -r -p \
+        > "${file}.new"
+        if cmp -s "${file}" "${file}.new"; then
+            echo "No changes made to ${file}. Exiting."
+            exit 1
+        fi
+        mv "${file}.new" "${file}"
+        chmod +x "${file}"
+        echo "Replaced ${replace_type} in ${file}"
+    done
+}
 
-for file in ${cert_hash_replace_files}; do
-    xxd -p "${file}" \
-    | tr -d '\n' \
-    | sed -e "s|${original_cert_hash}|${new_cert_hash}|" \
-    | xxd -r -p \
-    > "${file}.new"
-    if cmp -s "${file}" "${file}.new"; then
-        echo "No changes made to ${file}. Exiting."
-        exit 1
-    fi
-    mv "${file}.new" "${file}"
-    chmod +x "${file}"
-    echo "Replaced certificate hash in ${file}"
-done
+replace_in_files "certificate" "${cert_replace_files}" "${original_cert}" "${new_cert}"
+replace_in_files "certificate hash" "${cert_hash_replace_files}" "${original_cert_hash}" "${new_cert_hash}"
 
 echo "Patching bitwarden completed successfully"
