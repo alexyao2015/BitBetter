@@ -73,7 +73,7 @@ sudo curl -o patch-bitwarden-custom.sh https://raw.githubusercontent.com/alexyao
 Generate Custom License:
 
 ```bash
-sudo docker run -it --rm -v $PWD/bwdata/bitbetter/bitwarden.cer:/bitbetter/certs/bitbetter.cer -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-custom-latest
+sudo docker run -it --rm -v $PWD/bwdata/bitbetter/bitbetter.key:/bitbetter/certs/bitbetter.key -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-custom-latest
 ```
 
 Updating:
