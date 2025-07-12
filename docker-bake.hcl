@@ -2,9 +2,11 @@ group "default" {
   targets = [
       "bitbetter-api-custom",
       "bitbetter-identity-custom",
+      "bitbetter-self-host-custom",
       "bitbetter-licensegen-custom",
       "bitbetter-api-public",
       "bitbetter-identity-public",
+      "bitbetter-self-host-public",
       "bitbetter-licensegen-public",
       "bitbetter-certificate-gen"
   ]
@@ -46,6 +48,15 @@ target "bitbetter-identity-custom" {
   tags = ["${IMAGE_BASE}/identity:${BW_VERSION}"]
 }
 
+target "bitbetter-self-host-custom" {
+  args = {
+      BITWARDEN_BASE = "${BW_BASE}/self-host:${BW_VERSION}-beta"
+  }
+  target = "custom"
+  context = "src/bitbetter"
+  tags = ["${IMAGE_BASE}/self-host:${BW_VERSION}"]
+}
+
 target "bitbetter-licensegen-custom" {
   context = "src/license_gen"
   target = "custom"
@@ -70,6 +81,16 @@ target "bitbetter-identity-public" {
   target = "public"
   context = "src/bitbetter"
   tags = ["${IMAGE_BASE}/identity:${BW_VERSION}"]
+}
+
+target "bitbetter-self-host-public" {
+  inherits = ["_certs-context"]
+  args = {
+      BITWARDEN_BASE = "${BW_BASE}/self-host:${BW_VERSION}-beta"
+  }
+  target = "public"
+  context = "src/bitbetter"
+  tags = ["${IMAGE_BASE}/self-host:${BW_VERSION}"]
 }
 
 target "bitbetter-licensegen-public" {

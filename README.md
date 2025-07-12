@@ -11,37 +11,31 @@ _Beware! BitBetter does janky stuff to rewrite the bitwarden core dll and allow 
 
 Credit to https://github.com/h44z/BitBetter and https://github.com/jakeswenson/BitBetter
 
-# Table of Contents
+# Refactor Notice
 
-1. [Getting Started](#getting-started)
-   - [Dependencies](#dependencies)
-   - [Setting up BitBetter](#setting-up-bitbetter)
-     - [Using Public Images](#using-public-images)
-     - [Using Public Images with Custom Certificate](#using-public-images-with-custom-certificate)
-   - [Building BitBetter](#building-bitbetter)
-   - [Updating Bitwarden and BitBetter](#updating-bitwarden-and-bitbetter)
-   - [Generating Signed Licenses](#generating-signed-licenses)
-2. [FAQ](#faq-questions-you-might-have-)
-3. [Footnotes](#footnotes)
+There was a major refactor done that improved the rebustness of the patching to
+remove the need to recompile bitwarden images.
 
-# Getting Started
+Several BREAKING changes were made:
 
-The following instructions are for unix-based systems (Linux, BSD, macOS), it is possible to use a Windows systems assuming you are able to enable and install [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
+- Previously generated certificates are no longer compatible and will need to be
+  regenerated
+- Previously generated licenses will need to be regenerated and installed
+- Previously, the public images did not have a suffix and now will have the
+  -public suffix
+- patch-bitwarden-custom.sh and patch-bitwarden.sh (renamed to
+  patch-bitwarden-public.sh) scripts were updated and need to be locally
+  redownloaded
 
-## Dependencies
+# Install methods
 
-Aside from docker, which you also need for Bitwarden, BitBetter requires the following:
+There are two installation methods. One utilizes public licensing certificates
+and keys to ease the installation and remove the need for you to manually keep
+track of certificates. The custom method keeps certificates private but requires
+you to generate and store them. Sinc the certificates are only used for
+licensing, there is no security concerns.
 
-- Bitwarden (tested with 1.37.0, might work on lower versions)
-- openssl (probably already installed on most Linux or WSL systems, any version should work)
-
-## Setting up BitBetter
-
-With your dependencies installed, begin the installation of BitBetter by downloading it through Github or using the git command:
-
-```bash
-git clone https://github.com/jakeswenson/BitBetter.git
-```
+It is recommended to use the public method for ease of setup.
 
 ### Using Public Images
 
