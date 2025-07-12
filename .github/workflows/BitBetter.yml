@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build BitBetter
     needs: [check_version, regenerate_cert]
-    if: ${{ needs.check_version.outputs.buildimage == 'true' || needs.regenerate_cert.outputs.regenerate == 'true' || github.event_name == 'push' }}
+    if: ${{ needs.check_version.outputs.buildimage == 'true' || needs.regenerate_cert.outputs.regenerate == 'true' || github.event_name != 'schedule' }}
     strategy:
       matrix:
         include:
