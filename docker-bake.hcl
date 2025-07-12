@@ -36,7 +36,7 @@ target "bitbetter-api-custom" {
   }
   target = "custom"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/api:${BW_VERSION}"]
+  tags = ["${IMAGE_BASE}/api-custom:${BW_VERSION}"]
 }
 
 target "bitbetter-identity-custom" {
@@ -45,7 +45,7 @@ target "bitbetter-identity-custom" {
   }
   target = "custom"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/identity:${BW_VERSION}"]
+  tags = ["${IMAGE_BASE}/identity-custom:${BW_VERSION}"]
 }
 
 target "bitbetter-self-host-custom" {
@@ -54,13 +54,13 @@ target "bitbetter-self-host-custom" {
   }
   target = "custom"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/self-host:${BW_VERSION}"]
+  tags = ["${IMAGE_BASE}/self-host-custom:${BW_VERSION}"]
 }
 
 target "bitbetter-licensegen-custom" {
   context = "src/license_gen"
   target = "custom"
-  tags = ["${IMAGE_BASE}/licensegen:${BW_VERSION}"]
+  tags = ["${IMAGE_BASE}/licensegen-custom:${BW_VERSION}"]
 }
 
 target "bitbetter-api-public" {
@@ -70,7 +70,7 @@ target "bitbetter-api-public" {
   }
   target = "public"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/api:${BW_VERSION}"]
+  tags = ["${IMAGE_BASE}/api-public:${BW_VERSION}"]
 }
 
 target "bitbetter-identity-public" {
@@ -80,7 +80,7 @@ target "bitbetter-identity-public" {
   }
   target = "public"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/identity:${BW_VERSION}"]
+  tags = ["${IMAGE_BASE}/identity-public:${BW_VERSION}"]
 }
 
 target "bitbetter-self-host-public" {
@@ -90,14 +90,14 @@ target "bitbetter-self-host-public" {
   }
   target = "public"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/self-host:${BW_VERSION}"]
+  tags = ["${IMAGE_BASE}/self-host-public:${BW_VERSION}"]
 }
 
 target "bitbetter-licensegen-public" {
   inherits = ["_certs-context"]
   context = "src/license_gen"
   target = "public"
-  tags = ["${IMAGE_BASE}/licensegen:${BW_VERSION}"]
+  tags = ["${IMAGE_BASE}/licensegen-public:${BW_VERSION}"]
 }
 
 target "bitbetter-certificate-gen" {
