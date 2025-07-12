@@ -53,7 +53,7 @@ sudo curl -o patch-bitwarden.sh https://raw.githubusercontent.com/alexyao2015/Bi
 Generate a License:
 
 ```bash
-sudo docker run -it --rm ghcr.io/alexyao2015/bitbetter:licensegen-public-latest
+sudo docker run -it --rm -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-public-latest
 ```
 
 Updating:
@@ -73,7 +73,7 @@ sudo curl -o patch-bitwarden-custom.sh https://raw.githubusercontent.com/alexyao
 Generate Custom License:
 
 ```bash
-sudo docker run -it --rm -v $PWD/bwdata/bitbetter/certs/bitwarden.cer:/bitbetter/certs/bitbetter.cer ghcr.io/alexyao2015/bitbetter:licensegen-custom-latest
+sudo docker run -it --rm -v $PWD/bwdata/bitbetter/certs/bitwarden.cer:/bitbetter/certs/bitbetter.cer -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-custom-latest
 ```
 
 Updating:
@@ -120,7 +120,7 @@ Replace `self_host_method` with `public`.
 #### Generate a License:
 
 ```bash
-sudo docker run -it --rm ghcr.io/alexyao2015/bitbetter:licensegen-public-<bitwarden_version>
+sudo docker run -it --rm -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-public-<bitwarden_version>
 ```
 
 ### Using custom images
@@ -150,5 +150,5 @@ docker run --rm -v <path_to_store_certs>:/certs ghcr.io/alexyao2015/bitbetter:ce
 #### Generate a License:
 
 ```bash
-sudo docker run -it --rm -v <path_to_store_certs>/bitbetter/certs/bitbetter.key:/bitbetter/certs/bitbetter.key ghcr.io/alexyao2015/bitbetter:licensegen-custom-<bitwarden_version>
+sudo docker run -it --rm -v <path_to_store_certs>/bitbetter/certs/bitbetter.key:/bitbetter/certs/bitbetter.key -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-custom-<bitwarden_version>
 ```
