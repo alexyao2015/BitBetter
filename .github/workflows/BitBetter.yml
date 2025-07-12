@@ -131,8 +131,8 @@ jobs:
             password: dockerPassword
             repo: yaoa/bitbetter
           - url: ghcr.io/alexyao2015
-            username: ${{ github.actor }}
-            password: GITHUB_TOKEN
+            username: CR_USER
+            password: CR_PAT
             repo: ghcr.io/alexyao2015/bitbetter
         image_name:
           - api-public
