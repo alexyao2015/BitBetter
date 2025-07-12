@@ -166,6 +166,7 @@ class LicenseGenerator:
             "UsePasswordManager": True,
             "UseSecretsManager": True,
             "UseRiskInsights": True,
+            "UseAdminSponsoredFamilies": True,
             "UseOrganizationDomains": True,
         }
         license.update(self.license_dates)
