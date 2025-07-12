@@ -47,7 +47,7 @@ The following methods detail installation of bitbetter with the standard install
 First patch the Bitwarden script to use BitBetter Images:
 
 ```bash
-sudo curl -o patch-bitwarden.sh https://raw.githubusercontent.com/alexyao2015/BitBetter/public/patch-bitwarden.sh && sudo chmod 755 patch-bitwarden.sh && sudo ./patch-bitwarden.sh
+sudo curl -o patch-bitwarden-public.sh https://raw.githubusercontent.com/alexyao2015/BitBetter/public/patch-bitwarden-public.sh && sudo chmod 755 patch-bitwarden-public.sh && sudo ./patch-bitwarden-public.sh
 ```
 
 Generate a License:
@@ -59,7 +59,7 @@ sudo docker run -it --rm -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015
 Updating:
 
 ```bash
-sudo ./patch-bitwarden.sh
+sudo ./patch-bitwarden-public.sh
 ```
 
 ### Using Custom Images
@@ -86,12 +86,12 @@ sudo ./patch-bitwarden-custom.sh
 
 WARNING: This section may or may not be accurate
 
-To update Bitwarden, ran `patch-bitwarden.sh` or `patch-bitwarden-custom.sh ` script, depending or your installation. It will rebuild the BitBetter images and automatically update Bitwarden afterwards. Docker pull errors can be ignored for api and identity images.
+To update Bitwarden, ran `patch-bitwarden-public.sh` or `patch-bitwarden-custom.sh ` script, depending or your installation. It will rebuild the BitBetter images and automatically update Bitwarden afterwards. Docker pull errors can be ignored for api and identity images.
 
-You can either run these scripts without providing any parameters, in interactive mode (e.g. `./patch-bitwarden.sh`) or by setting the parameters as follows, to run the script in non-interactive mode:
+You can either run these scripts without providing any parameters, in interactive mode (e.g. `./patch-bitwarden-public.sh`) or by setting the parameters as follows, to run the script in non-interactive mode:
 
 ```bash
-./patch-bitwarden.sh <bitwarden-path> <update-override>
+./patch-bitwarden-public.sh <bitwarden-path> <update-override>
 ./patch-bitwarden-custom.sh <bitwarden-path> <update-override> <regenerate-certificates>
 ```
 
