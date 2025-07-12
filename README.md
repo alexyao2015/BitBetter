@@ -37,7 +37,7 @@ licensing, there is no security concerns.
 
 It is recommended to use the public method for ease of setup.
 
-### Using Public Images
+## Using Public Images
 
 First patch the Bitwarden script to use BitBetter Images:
 
@@ -57,7 +57,7 @@ Updating:
 sudo ./patch-bitwarden.sh
 ```
 
-### Using Public Images with Custom Certificate
+## Using Custom Images
 
 Patch the Bitwarden script to use BitBetter Images (Automatically generates certificates):
 
@@ -77,54 +77,7 @@ Updating:
 sudo ./patch-bitwarden-custom.sh
 ```
 
-## Building BitBetter
-
-Now that you've set up your build environment, you can **run the main build script** to generate a modified version of the `bitwarden/api` and `bitwarden/identity` docker images.
-
-From the BitBetter directory, simply run:
-
-```bash
-./build.sh
-```
-
-This will create a new self-signed certificate in the `.keys` directory if one does not already exist and then create a modified version of the official `bitwarden/api` called `bitbetter/api` and a modified version of the `bitwarden/identity` called `bitbetter/identity`.
-
-You may now simply create the file `/path/to/bwdata/docker/docker-compose.override.yml` with the following contents to utilize the modified images.
-
-```yaml
-version: "3"
-
-services:
-  api:
-    image: bitbetter/api
-
-  identity:
-    image: bitbetter/identity
-```
-
-You'll also want to edit the `/path/to/bwdata/scripts/run.sh` file. In the `function restart()` block, comment out the call to `dockerComposePull`.
-
-> Replace `dockerComposePull`<br>with `#dockerComposePull`
-
-You can now start or restart Bitwarden as normal and the modified api will be used. **It is now ready to accept self-issued licenses.**
-
----
-
-### Note: Manually generating Certificate & Key
-
-If you wish to generate your self-signed cert & key manually, you can run the following commands.
-
-```bash
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.cert -days 36500 -outform DER -passout pass:test
-openssl x509 -inform DER -in cert.cert -out cert.pem
-openssl pkcs12 -export -out cert.pfx -inkey key.pem -in cert.pem -passin pass:test -passout pass:test
-```
-
-> Note that the password here must be `test`.<sup>[1](#f1)</sup>
-
----
-
-## Updating Bitwarden and BitBetter
+# Updating Bitwarden and BitBetter
 
 To update Bitwarden, ran `patch-bitwarden.sh` or `patch-bitwarden-custom.sh ` script, depending or your installation. It will rebuild the BitBetter images and automatically update Bitwarden afterwards. Docker pull errors can be ignored for api and identity images.
 
@@ -140,60 +93,3 @@ You can either run these scripts without providing any parameters, in interactiv
 `<update-override>`: If you want the docker-compose.override.yml file to be updated (either `y` or `n`)
 
 `<regenerate-certificates>`: It you want to regenerate the custom certificates in bitwarden-path/bwdata/bitbetter (either `y` or `n`)
-
-## Generating Signed Licenses
-
-There is a tool included in the directory `src/license_gen/` that will generate new individual and organization licenses. These licenses will be accepted by the modified Bitwarden because they will be signed by the certificate you generated in earlier steps.
-
-First, from the `BitBetter/src/license_gen` directory, **build the license generator**.<sup>[2](#f2)</sup>
-
-```bash
-./build.sh
-```
-
-In order to run the tool and generate a license you'll need to get a **user's GUID** in order to generate an **invididual license** or the server's **install ID** to generate an **Organization license**. These can be retrieved most easily through the Bitwarden [Admin Portal](https://help.bitwarden.com/article/admin-portal/).
-
-If you generated your keys in the default `BitBetter/.keys` directory, you can **simply run the license gen in interactive mode** from the `Bitbetter` directory and **follow the prompts to generate your license**.
-
-```bash
-./src/license_gen/run.sh interactive
-```
-
-**The license generator will spit out a JSON-formatted license which can then be used within the Bitwarden web front-end to license your user or org!**
-
----
-
-### Note: Alternative Ways to Generate License
-
-If you wish to run the license gen from a directory aside from the root `BitBetter` one, you'll have to provide the absolute path to your cert.pfx.
-
-```bash
-./src/license_gen/run.sh /Absolute/Path/To/BitBetter/.keys/cert.pfx interactive
-```
-
-Additional, instead of interactive mode, you can also pass the parameters directly to the command as follows.
-
-```bash
-./src/license_gen/run.sh /Absolute/Path/To/BitBetter/.keys/cert.pfx user "Name" "EMail" "User-GUID"
-./src/license_gen/run.sh /Absolute/Path/To/BitBetter/.keys/cert.pfx org "Name" "EMail" "Install-ID used to install the server"
-```
-
----
-
-# FAQ: Questions you might have.
-
-## Why build a license generator for open source software?
-
-We agree that Bitwarden is great. If we didn't care about it then we wouldn't be doing this. We believe that if a user wants to host Bitwarden themselves, in their house, for their family to use amd with the ability to share access, they would still have to pay a **monthly** enterprise organization fee. When hosting and maintaining the software yourself there is no need to pay for the level of service that an enterprise customer needs.
-
-Unfortunately, Bitwarden doesn't seem to have any method for receiving donations so we recommend making a one-time donation to your open source project of choice for each BitBetter license you generate if you can afford to do so.
-
-## Shouldn't you have reached out to Bitwarden to ask them for alternative licensing structures?
-
-In the past we have done so but they were not focused on the type of customer that would want a one-time license and would be happy to sacrifice customer service. We believe the features that are currently behind this subscription paywall to be critical ones and believe they should be available to users who can't afford an enterprise payment structure. We'd even be happy to see a move towards a Gitlab-like model where premium features are rolled out _first_ to the enterprise subscribers before being added to the fully free version.
-
-# Footnotes
-
-<a name="#f1"><sup>1</sup></a> If you wish to change this you'll need to change the value that `src/license_gen/Program.cs` uses for its `GenerateUserLicense` and `GenerateOrgLicense` calls. Remember, this is really unnecessary as this certificate does not represent any type of security-related certificate.
-
-<a name="#f2"><sup>2</sup></a>This tool builds on top of the `bitbetter/api` container image so make sure you've built that above using the root `./build.sh` script.
