@@ -126,18 +126,14 @@ jobs:
     strategy:
       matrix:
         registry:
-          - {
-              url: "https://index.docker.io/v1/",
-              username: dockerID,
-              password: dockerPassword,
-              repo: yaoa/bitbetter,
-            }
-          - {
-              url: ghcr.io/alexyao2015,
-              username: CR_USER,
-              password: CR_PAT,
-              repo: ghcr.io/alexyao2015/bitbetter,
-            }
+          - url: "https://index.docker.io/v1/"
+            username: dockerID
+            password: dockerPassword
+            repo: yaoa/bitbetter
+          - url: ghcr.io/alexyao2015
+            username: ${{ github.actor }}
+            password: GITHUB_TOKEN
+            repo: ghcr.io/alexyao2015/bitbetter
         image_name:
           - api-public
           - identity-public
@@ -169,7 +165,9 @@ jobs:
           docker load --input output.tar
       - name: Login
         run: |
-          docker login ${{ matrix.registry.url }} -u ${{ secrets[matrix.registry.username] }} -p ${{ secrets[matrix.registry.password] }}
+          username="${{ secrets[matrix.registry.username] || matrix.registry.username }}"
+          password="${{ secrets[matrix.registry.password] || matrix.registry.password }}"
+          docker login ${{ matrix.registry.url }} -u "${username}" -p "${password}"
       - name: Deploy Run Number
         run: |
           new_image_name="${{ matrix.registry.repo }}:${{ matrix.image_name }}-${{ github.run_number }}"
