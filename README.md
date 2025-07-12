@@ -73,7 +73,7 @@ sudo curl -o patch-bitwarden-custom.sh https://raw.githubusercontent.com/alexyao
 Generate Custom License:
 
 ```bash
-sudo docker run -it --rm -v $PWD/bwdata/bitbetter/certs/bitwarden.cer:/bitbetter/certs/bitbetter.cer -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-custom-latest
+sudo docker run -it --rm -v $PWD/bwdata/bitbetter/bitwarden.cer:/bitbetter/certs/bitbetter.cer -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-custom-latest
 ```
 
 Updating:
@@ -133,22 +133,22 @@ sudo docker run -it --rm -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015
 docker run --rm -v <path_to_store_certs>:/certs ghcr.io/alexyao2015/bitbetter:certificate-gen-<bitwarden_version>
 ```
 
-- Mount `<path_to_store_certs>/bitbetter/certs/bitbetter.cer` to `/bitbetter/certs/bitbetter.cer` in the container.
+- Mount `<path_to_store_certs>/bitbetter/bitbetter.cer` to `/bitbetter/certs/bitbetter.cer` in the container.
 
   - For docker compose, add this to your `volumes` section
 
 ```
-<path_to_store_certs>/bitbetter/certs/bitbetter.cer:/bitbetter/certs/bitbetter.cer
+<path_to_store_certs>/bitbetter/bitbetter.cer:/bitbetter/certs/bitbetter.cer
 ```
 
 - For docker run, use the following
 
 ```
--v <path_to_store_certs>/bitbetter/certs/bitbetter.cer:/bitbetter/certs/bitbetter.cer
+-v <path_to_store_certs>/bitbetter/bitbetter.cer:/bitbetter/certs/bitbetter.cer
 ```
 
 #### Generate a License:
 
 ```bash
-sudo docker run -it --rm -v <path_to_store_certs>/bitbetter/certs/bitbetter.key:/bitbetter/certs/bitbetter.key -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-custom-<bitwarden_version>
+sudo docker run -it --rm -v <path_to_store_certs>/bitbetter/bitbetter.key:/bitbetter/certs/bitbetter.key -v $(pwd)/license:/bitbetter/output ghcr.io/alexyao2015/bitbetter:licensegen-custom-<bitwarden_version>
 ```
