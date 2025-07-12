@@ -182,5 +182,8 @@ if __name__ == "__main__":
         license_json = license_generator.interactive_request_organization_license()
     else:
         license_json = license_generator.interactive_request_user_license()
+    output_license = Path("/bitbetter/output/license.json")
+    output_license.write_text(license_json)
+    output_license.chmod(0o666)
+    print(f"License written to {output_license}")
     print(license_json)
-    Path("/bitbetter/output/license.json").write_text(license_json)
