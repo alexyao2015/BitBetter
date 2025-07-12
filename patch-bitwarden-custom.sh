@@ -28,10 +28,10 @@ SCRIPT_BASE=${tmpbase:-$SCRIPT_BASE}
 [ -f "$SCRIPT_BASE/bitwarden.sh" ] || { echo "Bitwarden base directory $SCRIPT_BASE is not valid!"; exit 1; }
 
 
-# Check if BitBetter directory exists; if exists ask to regenerate, if not generate
-if [ ! -d "$SCRIPT_BASE/bwdata/bitbetter" ]; then
+# Check if BitBetter cert exists; if exists ask to regenerate, if not generate
+if [ ! -f "$SCRIPT_BASE/bwdata/bitbetter/certs/bitbetter.cer" ]; then
     echo "Generating new certificates..."
-    docker run --rm -v $SCRIPT_BASE/bwdata/bitbetter:/certs ghcr.io/alexyao2015/bitbetter:certificate-gen-${BW_VERSION}
+    docker run --rm -v $SCRIPT_BASE/bwdata/bitbetter/certs:/certs ghcr.io/alexyao2015/bitbetter:certificate-gen-${BW_VERSION}
     echo "Certificates generated!"
 else
     # Check if user wants to regenerate certificates
@@ -41,7 +41,7 @@ else
 
     if [[ $REGEN_CERT =~ ^[Yy]$ ]]
     then
-        docker run --rm -v $SCRIPT_BASE/bwdata/bitbetter:/certs ghcr.io/alexyao2015/bitbetter:certificate-gen-${BW_VERSION}
+        docker run --rm -v $SCRIPT_BASE/bwdata/bitbetter/certs:/certs ghcr.io/alexyao2015/bitbetter:certificate-gen-${BW_VERSION}
     else
         echo "Not creating new certificates!"
     fi
@@ -57,9 +57,9 @@ if [[ $RECREATE_OV =~ ^[Yy]$ ]]
 then
     yq -i eval '.version = "3"' bwdata/docker docker-compose.override.yml
     yq -i eval ".services.api.image = \"ghcr.io/alexyao2015/bitbetter:api-custom-$BW_VERSION\"" bwdata/docker docker-compose.override.yml
-    yq -i eval '.services.api.volumes = ["../bitbetter/cert.cert:/newLicensing.cer"]'  bwdata/docker docker-compose.override.yml
+    yq -i eval '.services.api.volumes = ["../bitbetter/certs/bitbetter.cer:/bitbetter/certs/bitbetter.cer"]'  bwdata/docker docker-compose.override.yml
     yq -i eval ".services.identity.image = \"ghcr.io/alexyao2015/bitbetter:identity-custom-$BW_VERSION\"" bwdata/docker docker-compose.override.yml
-    yq -i eval '.services.identity.volumes = ["../bitbetter/cert.cert:/newLicensing.cer"]' bwdata/docker docker-compose.override.yml
+    yq -i eval '.services.identity.volumes = ["../bitbetter/certs/bitbetter.cer:/bitbetter/certs/bitbetter.cer"]' bwdata/docker docker-compose.override.yml
     echo "BitBetter docker-compose override updated!"
 else
     echo "Make sure to check if the docker override contains the correct image version ($BW_VERSION) in $SCRIPT_BASE/bwdata/docker/docker-compose.override.yml!"

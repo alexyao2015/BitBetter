@@ -2,6 +2,7 @@ name: BitBetter Image
 
 on:
   push:
+  pull_request:
   schedule:
     - cron: "0 0 * * *"
 jobs:
@@ -12,8 +13,6 @@ jobs:
       regenerate: ${{ steps.check_regenerate.outputs.regenerate }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "public"
       - name: Check if Regeneration Requested
         id: check_regenerate
         run: |
@@ -23,8 +22,7 @@ jobs:
         id: regenerate
         if: ${{ steps.check_regenerate.outputs.regenerate == 'true' }}
         run: |
-          docker build -f ./publicKeys/Dockerfile -t bitbetter/certificate-gen .
-          docker run --rm -v $PWD/publicKeys:/certs bitbetter/certificate-gen
+          src/cert_gen/generate.sh
           echo false > regenerate_cert.txt
           git config user.name alexyao2015
           git config user.email alexyao2015@gmail.com
@@ -40,8 +38,6 @@ jobs:
       buildversion: ${{ steps.get_version.outputs.buildversion }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "public"
       - name: Get Latest Version
         id: get_version
         run: |
@@ -58,166 +54,108 @@ jobs:
           echo Last build version: ${BW_VERSION_LAST_BUILT}
           echo Build version: ${BW_VERSION_LATEST}
 
-  build_bitwarden:
-    runs-on: ubuntu-latest
-    name: Build Bitwarden
-    needs: [check_version, regenerate_cert]
-    if: ${{ needs.check_version.outputs.buildimage == 'true' || needs.regenerate_cert.outputs.regenerate == 'true' || github.event_name == 'push' }}
-    strategy:
-      matrix:
-        include:
-          - image_name: api
-            src_location: src/Api/Dockerfile
-          - image_name: identity
-            src_location: src/Identity/Dockerfile
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: bitwarden/server
-          # The bitwarden/server tags are prefixed by v
-          ref: "v${{ needs.check_version.outputs.buildversion }}"
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker
-          install: true
-      - name: Patch source
-        # This removes the single file publish option which breaks resource replacement
-        run: |
-          sed -i 's|/p:PublishSingleFile=true||' ${{ matrix.src_location }}
-          cat ${{ matrix.src_location }}
-      - name: Build
-        run: |
-          docker build \
-            --tag bitbetter/bitwarden/${{ matrix.image_name }}:${{ needs.check_version.outputs.buildversion }} \
-            --progress plain \
-            --file ${{ matrix.src_location }} \
-            .
-      - name: Save tarball
-        run: |
-          docker save --output output.tar bitbetter/bitwarden/${{ matrix.image_name }}:${{ needs.check_version.outputs.buildversion }}
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ci-bitbetter-bitwarden-${{ matrix.image_name }}-${{ needs.check_version.outputs.buildversion }}-${{ github.run_number }}.tar
-          path: output.tar
-
   build_bitbetter:
     runs-on: ubuntu-latest
     name: Build BitBetter
-    needs: [check_version, build_bitwarden]
+    needs: [check_version, regenerate_cert]
+    if: ${{ needs.check_version.outputs.buildimage == 'true' || needs.regenerate_cert.outputs.regenerate == 'true' || github.event_name != 'schedule' }}
     strategy:
       matrix:
         include:
-          - image_name: api
-            src_location: ./src/bitBetter/Dockerfile
-            bitwarden_image_name: api
-            target: public
-          - image_name: identity
-            src_location: ./src/bitBetter/Dockerfile
-            bitwarden_image_name: identity
-            target: public
-          - image_name: licensegen
-            src_location: ./src/licenseGen/Dockerfile
-            bitwarden_image_name: api
-            target: public
+          - target: bitbetter-api-public
+            image_name: api-public
+          - target: bitbetter-identity-public
+            image_name: identity-public
+          - target: bitbetter-self-host-public
+            image_name: self-host-public
+          - target: bitbetter-licensegen-public
+            image_name: licensegen-public
 
-          - image_name: api-custom
-            src_location: ./src/bitBetter/Dockerfile
-            bitwarden_image_name: api
-            target: custom
-          - image_name: identity-custom
-            src_location: ./src/bitBetter/Dockerfile
-            bitwarden_image_name: identity
-            target: custom
-          - image_name: licensegen-custom
-            src_location: ./src/licenseGen/Dockerfile
-            bitwarden_image_name: api
-            target: custom
-          - image_name: certificate-gen
-            src_location: ./publicKeys/Dockerfile
-            bitwarden_image_name: api
-            target: custom
+          - target: bitbetter-api-custom
+            image_name: api-custom
+          - target: bitbetter-identity-custom
+            image_name: identity-custom
+          - target: bitbetter-self-host-custom
+            image_name: self-host-custom
+          - target: bitbetter-licensegen-custom
+            image_name: licensegen-custom
 
+          - target: bitbetter-certificate-gen
+            image_name: certificate-gen
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "public"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver: docker
           install: true
-      - name: Download container artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: "ci-bitbetter-bitwarden-${{ matrix.bitwarden_image_name }}-${{ needs.check_version.outputs.buildversion }}-${{ github.run_number }}.tar"
-      - name: Import image
+      - name: Set Variables
+        id: set_var
         run: |
-          docker load --input output.tar
+          set -x
+          artifact_name="ci-${{ matrix.image_name }}-${{ github.run_number }}"
+          docker_image_name="bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }}"
+          echo "artifact_name=${artifact_name}" >> $GITHUB_OUTPUT
+          echo "docker_image_name=${docker_image_name}" >> $GITHUB_OUTPUT
       - name: Build
         run: |
-          docker build \
-            --build-arg BITWARDEN_TAG=bitbetter/bitwarden/${{ matrix.bitwarden_image_name }}:${{ needs.check_version.outputs.buildversion }} \
-            --target ${{ matrix.target }} \
-            --tag bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }} \
-            --progress plain \
-            --file ${{ matrix.src_location }} \
-            .
+          BW_VERSION=${{ needs.check_version.outputs.buildversion }} \
+          IMAGE_BASE=bitbetter \
+            docker buildx bake \
+              --progress=plain \
+              --metadata-file=metadata.json \
+              ${{ matrix.target }}
+          image_name=$(jq -r '.["${{ matrix.target }}"]["image.name"]' metadata.json)
+          echo "Image built: ${image_name}"
+          docker tag "${image_name}" "${{ steps.set_var.outputs.docker_image_name }}"
+          echo "Image tagged: ${{ steps.set_var.outputs.docker_image_name }}"
       - name: Save tarball
         run: |
-          docker save --output output.tar bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }}
+          docker save --output output.tar ${{ steps.set_var.outputs.docker_image_name }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ci-${{ matrix.image_name }}-${{ github.run_number }}.tar
+          name: ${{ steps.set_var.outputs.artifact_name }}.tar
           path: output.tar
 
   publish_bitbetter:
     runs-on: ubuntu-latest
     name: Publish BitBetter
     needs: [check_version, build_bitbetter]
-    env:
-      VERSION: ${{ needs.check_version.outputs.buildversion }}
+    if: ${{ github.ref == 'refs/heads/public' && github.event_name == 'push' }}
     strategy:
       matrix:
         registry:
-          - {
-              url: "https://index.docker.io/v1/",
-              username: dockerID,
-              password: dockerPassword,
-              repo: yaoa/bitbetter,
-            }
-          - {
-              url: ghcr.io/alexyao2015,
-              username: CR_USER,
-              password: CR_PAT,
-              repo: ghcr.io/alexyao2015/bitbetter,
-            }
+          - url: "https://index.docker.io/v1/"
+            username: dockerID
+            password: dockerPassword
+            repo: yaoa/bitbetter
+          - url: ghcr.io/alexyao2015
+            username: ${{ github.actor }}
+            password: GITHUB_TOKEN
+            repo: ghcr.io/alexyao2015/bitbetter
         image_name:
-          [
-            api,
-            identity,
-            licensegen,
-            api-custom,
-            identity-custom,
-            licensegen-custom,
-            certificate-gen,
-          ]
+          - api-public
+          - identity-public
+          - licensegen-public
+          - self-host-public
 
+          - api-custom
+          - identity-custom
+          - licensegen-custom
+          - self-host-custom
+
+          - certificate-gen
     steps:
-      # just to improve readability
       - name: Set Variables
         id: set_var
+        # Directly copy from the build_bitbetter step because anchors are not supported
         run: |
-          export REPO=${{ matrix.registry.repo }}
-          export IMAGE_NAME=${{ matrix.image_name }}
-
-          echo "REPO=${REPO}" >> $GITHUB_ENV
-          echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_ENV
-
-          echo Repository set as: ${REPO}
-          echo Image name set as: ${IMAGE_NAME}
+          set -x
+          artifact_name="ci-${{ matrix.image_name }}-${{ github.run_number }}"
+          docker_image_name="bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }}"
+          echo "artifact_name=${artifact_name}" >> $GITHUB_OUTPUT
+          echo "docker_image_name=${docker_image_name}" >> $GITHUB_OUTPUT
       - name: Download container artifact
         uses: actions/download-artifact@v4
         with:
@@ -227,38 +165,45 @@ jobs:
           docker load --input output.tar
       - name: Login
         run: |
-          docker login ${{ matrix.registry.url }} -u ${{ secrets[matrix.registry.username] }} -p ${{ secrets[matrix.registry.password] }}
+          username="${{ secrets[matrix.registry.username] || matrix.registry.username }}"
+          password="${{ secrets[matrix.registry.password] || matrix.registry.password }}"
+          docker login ${{ matrix.registry.url }} -u "${username}" -p "${password}"
       - name: Deploy Run Number
         run: |
-          docker tag bitbetter/${IMAGE_NAME}:ci-${{ github.run_number }} ${REPO}:${IMAGE_NAME}-${{ github.run_number }}
-          docker push ${REPO}:${IMAGE_NAME}-${{ github.run_number }}
-          echo ${REPO}:${IMAGE_NAME}-${{ github.run_number }} Deployed
+          new_image_name="${{ matrix.registry.repo }}:${{ matrix.image_name }}-${{ github.run_number }}"
+          docker tag ${{ steps.set_var.outputs.docker_image_name }} "${new_image_name}"
+          docker push "${new_image_name}"
+          echo "${new_image_name}" Deployed
       - name: Deploy Latest
         run: |
-          docker tag bitbetter/${IMAGE_NAME}:ci-${{ github.run_number }} ${REPO}:${IMAGE_NAME}-latest
-          docker push ${REPO}:${IMAGE_NAME}-latest
-          echo ${REPO}:${IMAGE_NAME}-latest Deployed
+          new_image_name="${{ matrix.registry.repo }}:${{ matrix.image_name }}-latest"
+          docker tag ${{ steps.set_var.outputs.docker_image_name }} "${new_image_name}"
+          docker push "${new_image_name}"
+          echo "${new_image_name}" Deployed
       - name: Deploy Tag
         run: |
-          docker tag bitbetter/${IMAGE_NAME}:ci-${{ github.run_number }} ${REPO}:${IMAGE_NAME}-${VERSION}
-          docker push ${REPO}:${IMAGE_NAME}-${VERSION}
-          echo ${REPO}:${IMAGE_NAME}-${VERSION} Deployed
+          new_image_name="${{ matrix.registry.repo }}:${{ matrix.image_name }}-${{ needs.check_version.outputs.buildversion }}"
+          docker tag ${{ steps.set_var.outputs.docker_image_name }} "${new_image_name}"
+          docker push "${new_image_name}"
+          echo "${new_image_name}" Deployed
 
   commit_version:
     runs-on: ubuntu-latest
     name: Commit Build Version
     needs: [check_version, publish_bitbetter]
-    env:
-      VERSION: ${{ needs.check_version.outputs.buildversion }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "public"
-      # May fail if a push occurs but there is no new version to commit
       - name: Save Version Number
-        continue-on-error: true
         run: |
-          echo ${VERSION} > bw_version.txt
+          existing_version=$(cat bw_version.txt)
+          new_version=${{ needs.check_version.outputs.buildversion }}
+
+          if [ "$existing_version" == "${new_version}" ]; then
+            echo "No new version to commit"
+            exit
+          fi
+
+          echo "${new_version}" > bw_version.txt
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git add .
