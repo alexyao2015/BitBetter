@@ -38,7 +38,11 @@ licensing, there is no security concerns.
 
 It is recommended to use the public method for ease of setup.
 
-## Using Public Images
+## Install with standard bitwarden setup
+
+The following methods detail installation of bitbetter with the standard install method
+
+### Using Public Images
 
 First patch the Bitwarden script to use BitBetter Images:
 
@@ -49,7 +53,7 @@ sudo curl -o patch-bitwarden.sh https://raw.githubusercontent.com/alexyao2015/Bi
 Generate a License:
 
 ```bash
-sudo docker run -it --rm ghcr.io/alexyao2015/bitbetter:licensegen-latest
+sudo docker run -it --rm ghcr.io/alexyao2015/bitbetter:licensegen-public-latest
 ```
 
 Updating:
@@ -58,7 +62,7 @@ Updating:
 sudo ./patch-bitwarden.sh
 ```
 
-## Using Custom Images
+### Using Custom Images
 
 Patch the Bitwarden script to use BitBetter Images (Automatically generates certificates):
 
@@ -78,7 +82,9 @@ Updating:
 sudo ./patch-bitwarden-custom.sh
 ```
 
-# Updating Bitwarden and BitBetter
+### Updating Bitwarden and BitBetter
+
+WARNING: This section may or may not be accurate
 
 To update Bitwarden, ran `patch-bitwarden.sh` or `patch-bitwarden-custom.sh ` script, depending or your installation. It will rebuild the BitBetter images and automatically update Bitwarden afterwards. Docker pull errors can be ignored for api and identity images.
 
@@ -94,3 +100,55 @@ You can either run these scripts without providing any parameters, in interactiv
 `<update-override>`: If you want the docker-compose.override.yml file to be updated (either `y` or `n`)
 
 `<regenerate-certificates>`: It you want to regenerate the custom certificates in bitwarden-path/bwdata/bitbetter (either `y` or `n`)
+
+## Install using Bitwarden unified
+
+Follow the [official unified installation
+instructions](https://bitwarden.com/help/install-and-deploy-unified-beta), but
+replace `ghcr.io/bitwarden/self-host:beta` with
+
+```
+ghcr.io/alexyao2015/bitbetter:self-host-<self_host_method>-<bitwarden_version>
+```
+
+where `<bitwarden_version>` is `latest` or the bitwarden version you want (e.g. `2025.7.0`)
+
+### Using public images
+
+Replace `self_host_method` with `public`.
+
+#### Generate a License:
+
+```bash
+sudo docker run -it --rm ghcr.io/alexyao2015/bitbetter:licensegen-public-<bitwarden_version>
+```
+
+### Using custom images
+
+- Replace `self_host_method` with `custom`
+
+- Generate certificates using
+
+```bash
+docker run --rm -v <path_to_store_certs>:/certs ghcr.io/alexyao2015/bitbetter:certificate-gen-<bitwarden_version>
+```
+
+- Mount `<path_to_store_certs>/bitbetter/certs/bitbetter.cer` to `/bitbetter/certs/bitbetter.cer` in the container.
+
+  - For docker compose, add this to your `volumes` section
+
+```
+<path_to_store_certs>/bitbetter/certs/bitbetter.cer:/bitbetter/certs/bitbetter.cer
+```
+
+- For docker run, use the following
+
+```
+-v <path_to_store_certs>/bitbetter/certs/bitbetter.cer:/bitbetter/certs/bitbetter.cer
+```
+
+#### Generate a License:
+
+```bash
+sudo docker run -it --rm -v <path_to_store_certs>/bitbetter/certs/bitbetter.key:/bitbetter/certs/bitbetter.key ghcr.io/alexyao2015/bitbetter:licensegen-custom-<bitwarden_version>
+```
