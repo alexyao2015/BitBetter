@@ -56,6 +56,9 @@ jobs:
   build_bitbetter:
     runs-on: ubuntu-latest
     name: Build BitBetter
+    outputs:
+      image_name: ${{ steps.set_var.outputs.image_name }}
+      artifact_name: ${{ steps.set_var.outputs.artifact_name }}
     needs: [check_version, regenerate_cert]
     if: ${{ needs.check_version.outputs.buildimage == 'true' || needs.regenerate_cert.outputs.regenerate == 'true' || github.event_name == 'push' }}
     strategy:
@@ -84,6 +87,14 @@ jobs:
         with:
           driver: docker
           install: true
+      - name: Set Variables
+        id: set_var
+        run: |
+          set -x
+          artifact_name="ci-${{ matrix.image_name }}-${{ github.run_number }}"
+          docker_image_name="bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }}"
+          echo "artifact_name=${artifact_name}" >> $GITHUB_OUTPUT
+          echo "docker_image_name=${docker_image_name}" >> $GITHUB_OUTPUT
       - name: Build
         run: |
           BW_VERSION=${{ needs.check_version.outputs.buildversion }} \
@@ -94,20 +105,22 @@ jobs:
               ${{ matrix.target }}
           image_name=$(jq -r '.["${{ matrix.target }}"]["image.name"]' metadata.json)
           echo "Image built: ${image_name}"
-          docker tag "${image_name}" "bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }}"
+          docker tag "${image_name}" "${{ steps.set_var.outputs.docker_image_name }}"
+          echo "Image tagged: ${{ steps.set_var.outputs.docker_image_name }}"
       - name: Save tarball
         run: |
-          docker save --output output.tar bitbetter/${{ matrix.image_name }}:ci-${{ github.run_number }}
+          docker save --output output.tar ${{ steps.set_var.outputs.docker_image_name }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ci-${{ matrix.image_name }}-${{ github.run_number }}.tar
+          name: ${{ steps.set_var.outputs.artifact_name }}.tar
           path: output.tar
 
   publish_bitbetter:
     runs-on: ubuntu-latest
     name: Publish BitBetter
     needs: [check_version, build_bitbetter]
+    if: ${{ github.event_name == 'push' }}
     env:
       VERSION: ${{ needs.check_version.outputs.buildversion }}
     strategy:

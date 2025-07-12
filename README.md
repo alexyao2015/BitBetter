@@ -26,6 +26,7 @@ Several BREAKING changes were made:
 - patch-bitwarden-custom.sh and patch-bitwarden.sh (renamed to
   patch-bitwarden-public.sh) scripts were updated and need to be locally
   redownloaded
+- This project will work for bitwarden versions 2025.7.0 and onward
 
 # Install methods
 
