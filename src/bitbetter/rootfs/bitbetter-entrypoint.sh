@@ -2,4 +2,4 @@
 
 /bitbetter/patch.sh
 
-/entrypoint.sh
+exec /entrypoint.sh
