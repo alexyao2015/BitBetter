@@ -107,7 +107,7 @@ jobs:
               --progress=plain \
               --metadata-file=metadata.json \
               ${{ matrix.target }}
-          image_name=$(jq -r '.["${{ matrix.target }}"]["image.name"]' metadata.json)
+          image_name=$(jq -r '.["${{ matrix.target }}"]["image.name"]' metadata.json | cut -d',' -f1)
           echo "Image built: ${image_name}"
           docker tag "${image_name}" "${{ steps.set_var.outputs.docker_image_name }}"
           echo "Image tagged: ${{ steps.set_var.outputs.docker_image_name }}"
