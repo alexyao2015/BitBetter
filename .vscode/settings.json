@@ -1,0 +1,7 @@
+{
+  "rust-analyzer.linkedProjects": ["src/bitbetter/Cargo.toml"],
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true
+  }
+}
