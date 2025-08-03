@@ -1,0 +1,6 @@
+FROM mcr.microsoft.com/devcontainers/rust:1-1
+
+RUN mkdir -p /bitbetter \
+    && wget \
+    -O /bitbetter/licensing.cer \
+    https://github.com/bitwarden/server/raw/refs/heads/main/src/Core/licensing.cer

@@ -1,0 +1,16 @@
+{
+  "dockerFile": "Dockerfile.dev",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "HashiCorp.HCL",
+        "IronGeek.vscode-env",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.hexeditor",
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml"
+      ]
+    }
+  }
+}

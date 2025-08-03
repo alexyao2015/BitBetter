@@ -36,7 +36,10 @@ target "bitbetter-api-custom" {
   }
   target = "custom"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/api-custom:${BW_VERSION}"]
+  tags = [
+    "${IMAGE_BASE}/api-custom:${BW_VERSION}",
+    "${IMAGE_BASE}/api-custom:latest"
+  ]
 }
 
 target "bitbetter-identity-custom" {
@@ -45,7 +48,10 @@ target "bitbetter-identity-custom" {
   }
   target = "custom"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/identity-custom:${BW_VERSION}"]
+  tags = [
+    "${IMAGE_BASE}/identity-custom:${BW_VERSION}",
+    "${IMAGE_BASE}/identity-custom:latest"
+  ]
 }
 
 target "bitbetter-self-host-custom" {
@@ -54,13 +60,19 @@ target "bitbetter-self-host-custom" {
   }
   target = "custom"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/self-host-custom:${BW_VERSION}"]
+  tags = [
+    "${IMAGE_BASE}/self-host-custom:${BW_VERSION}",
+    "${IMAGE_BASE}/self-host-custom:latest"
+  ]
 }
 
 target "bitbetter-licensegen-custom" {
   context = "src/license_gen"
   target = "custom"
-  tags = ["${IMAGE_BASE}/licensegen-custom:${BW_VERSION}"]
+  tags = [
+    "${IMAGE_BASE}/licensegen-custom:${BW_VERSION}",
+    "${IMAGE_BASE}/licensegen-custom:latest"
+  ]
 }
 
 target "bitbetter-api-public" {
@@ -70,7 +82,10 @@ target "bitbetter-api-public" {
   }
   target = "public"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/api-public:${BW_VERSION}"]
+  tags = [
+    "${IMAGE_BASE}/api-public:${BW_VERSION}",
+    "${IMAGE_BASE}/api-public:latest"
+  ]
 }
 
 target "bitbetter-identity-public" {
@@ -80,7 +95,10 @@ target "bitbetter-identity-public" {
   }
   target = "public"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/identity-public:${BW_VERSION}"]
+  tags = [
+    "${IMAGE_BASE}/identity-public:${BW_VERSION}",
+    "${IMAGE_BASE}/identity-public:latest"
+  ]
 }
 
 target "bitbetter-self-host-public" {
@@ -90,17 +108,26 @@ target "bitbetter-self-host-public" {
   }
   target = "public"
   context = "src/bitbetter"
-  tags = ["${IMAGE_BASE}/self-host-public:${BW_VERSION}"]
+  tags = [
+    "${IMAGE_BASE}/self-host-public:${BW_VERSION}",
+    "${IMAGE_BASE}/self-host-public:latest"
+  ]
 }
 
 target "bitbetter-licensegen-public" {
   inherits = ["_certs-context"]
   context = "src/license_gen"
   target = "public"
-  tags = ["${IMAGE_BASE}/licensegen-public:${BW_VERSION}"]
+  tags = [
+    "${IMAGE_BASE}/licensegen-public:${BW_VERSION}",
+    "${IMAGE_BASE}/licensegen-public:latest"
+  ]
 }
 
 target "bitbetter-certificate-gen" {
   context = "src/cert_gen/docker"
-  tags = ["${IMAGE_BASE}/certificate-gen:${BW_VERSION}"]
+  tags = [
+    "${IMAGE_BASE}/certificate-gen:${BW_VERSION}",
+    "${IMAGE_BASE}/certificate-gen:latest"
+  ]
 }

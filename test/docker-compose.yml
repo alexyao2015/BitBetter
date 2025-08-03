@@ -1,0 +1,28 @@
+services:
+  bitwarden:
+    env_file:
+      - settings.env
+    image: bitbetter/self-host-public:latest
+    restart: always
+    stop_grace_period: 1s
+    ports:
+      - "8080:8080"
+
+  db:
+    environment:
+      MARIADB_USER: "bitwarden"
+      MARIADB_PASSWORD: "super_strong_password"
+      MARIADB_DATABASE: "bitwarden_vault"
+      MARIADB_RANDOM_ROOT_PASSWORD: "true"
+    image: mariadb:10
+    stop_grace_period: 1s
+    restart: always
+
+  licensegen:
+    image: bitbetter/licensegen-public:latest
+    profiles: ["manual"]
+    restart: "no"
+    stop_grace_period: 1s
+    volumes:
+      - ./license:/bitbetter/output
+# docker compose run --rm -it licensegen
