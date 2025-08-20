@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, bail};
 use clap::Parser;
-use kmp::kmp_match;
+use memchr::memmem::find_iter;
 use rayon::prelude::*;
 use std::collections::HashMap;
 use std::fs;
@@ -165,7 +165,7 @@ impl BitBetter {
     }
 
     fn contains_pattern(&self, haystack: &[u8], needle: &[u8]) -> Vec<usize> {
-        return kmp_match(needle, haystack);
+        return find_iter(haystack, needle).collect();
     }
 
     fn replace_in_file(
