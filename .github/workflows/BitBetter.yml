@@ -68,8 +68,8 @@ jobs:
             image_name: api-public
           - target: bitbetter-identity-public
             image_name: identity-public
-          - target: bitbetter-self-host-public
-            image_name: self-host-public
+          - target: bitbetter-lite-public
+            image_name: lite-public
           - target: bitbetter-licensegen-public
             image_name: licensegen-public
 
@@ -77,8 +77,8 @@ jobs:
             image_name: api-custom
           - target: bitbetter-identity-custom
             image_name: identity-custom
-          - target: bitbetter-self-host-custom
-            image_name: self-host-custom
+          - target: bitbetter-lite-custom
+            image_name: lite-custom
           - target: bitbetter-licensegen-custom
             image_name: licensegen-custom
 
@@ -140,12 +140,12 @@ jobs:
           - api-public
           - identity-public
           - licensegen-public
-          - self-host-public
+          - lite-public
 
           - api-custom
           - identity-custom
           - licensegen-custom
-          - self-host-custom
+          - lite-custom
 
           - certificate-gen
     steps:

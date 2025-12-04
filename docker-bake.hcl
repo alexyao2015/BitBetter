@@ -2,11 +2,11 @@ group "default" {
   targets = [
       "bitbetter-api-custom",
       "bitbetter-identity-custom",
-      "bitbetter-self-host-custom",
+      "bitbetter-lite-custom",
       "bitbetter-licensegen-custom",
       "bitbetter-api-public",
       "bitbetter-identity-public",
-      "bitbetter-self-host-public",
+      "bitbetter-lite-public",
       "bitbetter-licensegen-public",
       "bitbetter-certificate-gen"
   ]
@@ -54,15 +54,15 @@ target "bitbetter-identity-custom" {
   ]
 }
 
-target "bitbetter-self-host-custom" {
+target "bitbetter-lite-custom" {
   args = {
-      BITWARDEN_BASE = "${BW_BASE}/self-host:${BW_VERSION}-beta"
+      BITWARDEN_BASE = "${BW_BASE}/lite:${BW_VERSION}"
   }
   target = "custom"
   context = "src/bitbetter"
   tags = [
-    "${IMAGE_BASE}/self-host-custom:${BW_VERSION}",
-    "${IMAGE_BASE}/self-host-custom:latest"
+    "${IMAGE_BASE}/lite-custom:${BW_VERSION}",
+    "${IMAGE_BASE}/lite-custom:latest"
   ]
 }
 
@@ -101,16 +101,16 @@ target "bitbetter-identity-public" {
   ]
 }
 
-target "bitbetter-self-host-public" {
+target "bitbetter-lite-public" {
   inherits = ["_certs-context"]
   args = {
-      BITWARDEN_BASE = "${BW_BASE}/self-host:${BW_VERSION}-beta"
+      BITWARDEN_BASE = "${BW_BASE}/lite:${BW_VERSION}"
   }
   target = "public"
   context = "src/bitbetter"
   tags = [
-    "${IMAGE_BASE}/self-host-public:${BW_VERSION}",
-    "${IMAGE_BASE}/self-host-public:latest"
+    "${IMAGE_BASE}/lite-public:${BW_VERSION}",
+    "${IMAGE_BASE}/lite-public:latest"
   ]
 }
 

@@ -104,11 +104,11 @@ You can either run these scripts without providing any parameters, in interactiv
 ## Install using Bitwarden unified
 
 Follow the [official unified installation
-instructions](https://bitwarden.com/help/install-and-deploy-unified-beta), but
-replace `ghcr.io/bitwarden/self-host:beta` with
+instructions](https://bitwarden.com/help/install-and-deploy-lite/), but
+replace `ghcr.io/bitwarden/lite` with
 
 ```
-ghcr.io/alexyao2015/bitbetter:self-host-<self_host_method>-<bitwarden_version>
+ghcr.io/alexyao2015/bitbetter:lite-<self_host_method>-<bitwarden_version>
 ```
 
 where `<bitwarden_version>` is `latest` or the bitwarden version you want (e.g. `2025.7.0`)
