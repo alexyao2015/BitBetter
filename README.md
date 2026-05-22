@@ -64,6 +64,8 @@ sudo ./patch-bitwarden-public.sh
 
 ### Using Custom Images
 
+The following contains steps to use the default bitwarden run scripts. If you are using an alternative installation method, you can also supply the certificate to the bitbetter containers in a base64 encoded environment variable `BITBETTER_CERT_DATA`
+
 Patch the Bitwarden script to use BitBetter Images (Automatically generates certificates):
 
 ```bash
